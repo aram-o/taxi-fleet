@@ -1,0 +1,59 @@
+version: '3.5'
+
+volumes:
+  taxi-fleet-database-sql-volume:
+    name: "taxi-fleet-database-sql-volume"
+
+networks:
+  taxi-fleet-network:
+    name: "taxi-fleet-network"
+
+
+services:
+  taxi-fleet-database:
+    image: postgres:latest
+    restart: always
+    env_file:
+      - env/taxi-fleet-database.env
+    ports:
+      - '5432:5432'
+    volumes:
+      - taxi-fleet-database-sql-volume:/var/lib/postgresql
+    networks:
+      - taxi-fleet-network
+
+  taxi-fleet-app:
+    image: taxi-fleet-app:latest
+    restart: always
+    build: ./taxi-fleet-app
+    container_name: taxi-fleet-app
+    env_file:
+      - ./env/taxi-fleet-database-reference.env
+    ports:
+      - '11000:11000'
+    networks:
+      - taxi-fleet-network
+
+  dashboard-app:
+    image: dashboard-app:latest
+    restart: always
+    build: ./dashboard-app
+    container_name: dashboard-app
+    env_file:
+      - ./env/taxi-fleet-database-reference.env
+    ports:
+      - '11001:11001'
+    networks:
+      - taxi-fleet-network
+
+  taxi-fleet-migrator:
+    image: taxi-fleet-migrator:latest
+    build: ./taxi-fleet-migrator
+    container_name: taxi-fleet-migrator
+    restart: "no"
+    env_file:
+      - ./env/taxi-fleet-database-reference.env
+    depends_on:
+      - taxi-fleet-database
+    networks:
+      - taxi-fleet-network

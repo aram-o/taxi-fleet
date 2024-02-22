@@ -1,0 +1,16 @@
+
+spring:
+  application:
+    name: dashboard-app
+    
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/taxi_fleet_db}
+    username: ${POSTGRES_USER:taxi_fleet}
+    password: ${POSTGRES_PASSWORD:taxi_fleet}
+  
+server:
+  port: 11001
+  connection-timeout: 900000
+
+
+
